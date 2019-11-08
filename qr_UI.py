@@ -3,8 +3,7 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 import random
-import urllib.request
-
+import requests
 import time
 
 class MainWindow(QMainWindow):
@@ -14,6 +13,13 @@ class MainWindow(QMainWindow):
         super(MainWindow, self).__init__(*args, **kwargs)
     
         self.counter = 0
+        self.flag = False
+        
+        with open("MyFile.txt","r") as f:
+        	self.t = f.read() 
+        	print(self.t)
+        	f.close()
+        self.f1 = open("MyFile.txt", "w")
     
         layout = QHBoxLayout()
         
@@ -24,12 +30,12 @@ class MainWindow(QMainWindow):
     
         layout.addWidget(self.l)
 
-        self.download_add()
+
         layout.addWidget(self.l1)
-        Mypixmap = QPixmap('add.png')
+        Mypixmap = QPixmap('/home/rak3sh/rak3sh/py/feedback-bengalathon/Capture.PNG')
         Mypixmap1 = Mypixmap.scaled(400, 800)
         self.l1.setPixmap(Mypixmap1)
-        # layout.addWidget(b)
+        layout.addWidget(self.l1)
     
         w = QWidget()
         w.setLayout(layout)
@@ -37,33 +43,42 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(w)
     
         self.showFullScreen()
+        # self.show()
 
         self.timer = QTimer()
-        self.timer.setInterval(5000)
+        self.timer.setInterval(1000)
         self.timer.timeout.connect(self.recurring_timer)
         self.timer.start()
-    def getTempID_and_createNewQr(self):
-    	p = "1234"
-    	t = str(random.randint(1111,9999))
-    	self.newQr(p,t)
-    	time.sleep(2)
+    def __del__(self):
+    	print("Closing..")
+    	# f = open("MyFile.txt","w")
+    	self.f1.write(self.t) 
+    	self.f1.close()
+    	print("Sucess..")
 
-    def newQr(self,Purl, Turl):
-    	baseUrl = "https:://bengol.000webhostapp.com/call.php?Screennum="+Turl+"temp="+Purl
-    	code = pyqrcode.create(baseUrl)
+    def getTempID_and_createNewQr(self):
+        p = "1234"
+        # t = "0000"
+        self.newQr(p)
+        time.sleep(2)
+
+    def newQr(self,Purl):
+    	baseUrl = "https://bengol.000webhostapp.com/call.php?update&id="+self.t
+    	request = requests.post(baseUrl)
+    	self.t = request.text
+    	print("id UPDATED--->>" + request.text)
+    	code = pyqrcode.create("bengazi" + self.t + "5l")
     	code.svg('uca.svg', scale=4)
 
 
     def recurring_timer(self):
-        self.getTempID_and_createNewQr()
-        pixmap = QPixmap('uca.svg')
-        pixmap1 = pixmap.scaled(800, 800)
-        self.l.setPixmap(pixmap1)
+    	if self.flag is not True:
+    		self.timer.setInterval(60000)
+    	self.getTempID_and_createNewQr()
+    	pixmap = QPixmap('uca.svg')
+    	pixmap1 = pixmap.scaled(800, 800)
+    	self.l.setPixmap(pixmap1)
         # self.l.setText("Counter: %d" % self.counter)
-
-    def download_add(self):
-    	urllib.request.urlretrieve("https://raw.guthubusercontent.com/rakeshseal0/feedback-bengalathon/master/Capture.PNG", "add.png")
-
     
     
 app = QApplication([])
