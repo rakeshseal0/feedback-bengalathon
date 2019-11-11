@@ -32,7 +32,7 @@ class MainWindow(QMainWindow):
 
 
         layout.addWidget(self.l1)
-        Mypixmap = QPixmap('/home/rak3sh/rak3sh/py/feedback-bengalathon/Capture.PNG')
+        Mypixmap = QPixmap('/home/rak3sh/rak3sh/py/feedback-bengalathon/qr-ui/Capture.PNG')
         Mypixmap1 = Mypixmap.scaled(400, 800)
         self.l1.setPixmap(Mypixmap1)
         layout.addWidget(self.l1)
